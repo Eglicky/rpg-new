@@ -26,7 +26,6 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
       pants: 0,
       shirt: 0,
       skin: 0,
-      eyeColor: 0,
       glasses: false,
       hatColor: 0,
       size: 200,
@@ -34,6 +33,7 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
       fire: false,
       walking: false,
     };
+    this._applySeedToSettings(); // Ensure consistent character style on initialization
   }
 
   static get properties() {
@@ -72,7 +72,7 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
         }
         .seed-display {
           position: absolute;
-          top: -20px;
+          top: -50px;
           left: 50%;
           transform: translateX(-50%);
           background-color: rgba(0, 0, 0, 0.7);
@@ -155,11 +155,11 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
             pants="${this.characterSettings.pants}"
             shirt="${this.characterSettings.shirt}"
             skin="${this.characterSettings.skin}"
+            hatColor="${this.characterSettings.hatColor}"
             .fire="${this.characterSettings.fire}"
             .walking="${this.characterSettings.walking}"
             style="
               --character-size: ${this.characterSettings.size}px;
-              --eye-color: hsl(${this.characterSettings.eyeColor}, 100%, 50%);
               --hat-color: hsl(${this.characterSettings.hatColor}, 100%, 50%);
             "
           ></rpg-character>
@@ -245,21 +245,15 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
             @change="${(e) => this._updateSetting('skin', parseInt(e.detail.value))}"
           ></wired-slider>
 
-          <label for="eyeColor">Eye Color:</label>
-          <wired-slider
-            id="eyeColor"
-            value="${this.characterSettings.eyeColor}"
-            min="0"
-            max="360"
-            @change="${(e) => this._updateSetting('eyeColor', parseInt(e.detail.value))}"
-          ></wired-slider>
+          
+        
 
           <label for="hatColor">Hat Color:</label>
           <wired-slider
             id="hatColor"
             value="${this.characterSettings.hatColor}"
             min="0"
-            max="360"
+            max="9"
             @change="${(e) => this._updateSetting('hatColor', parseInt(e.detail.value))}"
           ></wired-slider>
 
@@ -282,28 +276,42 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
     `;
   }
 
+  _applySeedToSettings() {
+    const seed = this.characterSettings.seed;
+    const paddedSeed = seed.padStart(8, "0").slice(0, 8);
+    const values = paddedSeed.split("").map((v) => parseInt(v, 10));
+  
+    [
+      this.characterSettings.base,
+      this.characterSettings.face,
+      this.characterSettings.faceitem,
+      this.characterSettings.hair,
+      this.characterSettings.pants,
+      this.characterSettings.shirt,
+      this.characterSettings.skin,
+      this.characterSettings.hatColor,
+    ] = values;
+  
+    this.requestUpdate(); // Ensure UI updates after applying settings
+  }
+  
+
   _generateSeed() {
-    const { base, face, faceitem, hair, pants, shirt, skin } = this.characterSettings;
-    this.characterSettings.seed = `${base}${face}${faceitem}${hair}${pants}${shirt}${skin}`;
+    const { base, face, faceitem, hair, pants, shirt, skin, hatColor } = this.characterSettings;
+    this.characterSettings.seed = `${base}${face}${faceitem}${hair}${pants}${shirt}${skin}${hatColor}`;
   }
 
   _updateSetting(key, value) {
     this.characterSettings = { ...this.characterSettings, [key]: value };
     this._generateSeed();
+    this.requestUpdate();
   }
 
   _generateShareLink() {
     const baseUrl = window.location.href.split("?")[0];
-
-    const params = new URLSearchParams(
-      Object.entries(this.characterSettings).reduce((acc, [key, value]) => {
-        acc[key] = typeof value === "boolean" ? (value ? "1" : "0") : value;
-        return acc;
-      }, {})
-    ).toString();
-
+    const params = new URLSearchParams({ seed: this.characterSettings.seed }).toString();
     const shareLink = `${baseUrl}?${params}`;
-
+  
     navigator.clipboard.writeText(shareLink).then(
       () => this._showNotification("Link copied!"),
       (err) => this._showNotification(`Error: ${err}`)
@@ -321,26 +329,16 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
   }
 
   connectedCallback() {
-    super.connectedCallback();
-    const params = new URLSearchParams(window.location.search);
+  super.connectedCallback();
+  const params = new URLSearchParams(window.location.search);
 
-    params.forEach((value, key) => {
-      if (key in this.characterSettings) {
-        this.characterSettings = {
-          ...this.characterSettings,
-          [key]: isNaN(value)
-            ? value === "1"
-              ? true
-              : value === "0"
-              ? false
-              : value
-            : parseInt(value),
-        };
-      }
-    });
-    this._generateSeed();
-    this.requestUpdate();
+  if (params.has("seed")) {
+    this.characterSettings.seed = params.get("seed");
+    this._applySeedToSettings(); // Apply the seed to settings
   }
+  
+  this.requestUpdate();
+}
 }
 
 customElements.define(RpgNew.tag, RpgNew);
