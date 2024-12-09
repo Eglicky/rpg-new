@@ -54,10 +54,10 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
         .container {
           display: flex;
           flex-wrap: wrap;
-          gap: 20px;
+          gap: var(--ddd-spacing-5);
           justify-content: center;
           align-items: flex-start;
-          padding: 20px;
+          padding: var(--ddd-spacing-5);
         }
         .character-preview {
           flex: 1;
@@ -72,13 +72,13 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
         }
         .seed-display {
           position: absolute;
-          top: -50px;
+          top: calc(-1 * var(--ddd-spacing-10));
           left: 50%;
           transform: translateX(-50%);
           background-color: rgba(0, 0, 0, 0.7);
-          color: white;
-          padding: 5px 10px;
-          border-radius: 5px;
+          color: var(--ddd-theme-default-white);
+          padding: var(--ddd-spacing-1) var(--ddd-spacing-2);
+          border-radius: var(--ddd-spacing-1);
           font-size: 0.9rem;
           font-weight: bold;
           pointer-events: none;
@@ -92,42 +92,42 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
         wired-checkbox,
         wired-slider {
           display: block;
-          margin-bottom: 15px;
+          margin-bottom: var(--ddd-spacing-4);
           max-width: 300px;
         }
         label {
           display: block;
           font-size: 14px;
           font-weight: bold;
-          margin-bottom: 5px;
+          margin-bottom: var(--ddd-spacing-1);
         }
         button {
-          margin-top: 10px;
-          padding: 10px 20px;
+          margin-top: var(--ddd-spacing-2);
+          padding: var(--ddd-spacing-2) var(--ddd-spacing-4);
           cursor: pointer;
-          background-color: #007bff;
-          color: white;
-          border: 1px solid #0056b3;
-          border-radius: 4px;
+          background-color: var(--ddd-theme-default-blue);
+          color: var(--ddd-theme-default-white);
+          border: 1px solid var(--ddd-theme-default-darkBlue);
+          border-radius: var(--ddd-spacing-1);
           font-size: 16px;
           transition: background-color 0.3s ease, border-color 0.3s ease;
         }
         button:hover {
-          background-color: #0056b3;
-          border-color: #004085;
+          background-color: var(--ddd-theme-default-darkBlue);
+          border-color: var(--ddd-theme-default-darkerBlue);
         }
         .character-name {
           font-size: 1.5rem;
-          margin-bottom: 10px;
+          margin-bottom: var(--ddd-spacing-2);
         }
         .notification {
           position: fixed;
-          bottom: 20px;
-          right: 20px;
-          background-color: #28a745;
-          color: white;
-          padding: 10px 15px;
-          border-radius: 5px;
+          bottom: var(--ddd-spacing-5);
+          right: var(--ddd-spacing-5);
+          background-color: var(--ddd-theme-default-green);
+          color: var(--ddd-theme-default-white);
+          padding: var(--ddd-spacing-2) var(--ddd-spacing-3);
+          border-radius: var(--ddd-spacing-1);
           font-size: 14px;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
           opacity: 0;
@@ -179,8 +179,7 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
             ?checked="${this.characterSettings.base === 1}"
             @change="${(e) =>
               this._updateSetting('base', e.target.checked ? 1 : 0)}"
-            >Has Hair</wired-checkbox
-          >
+            >Has Hair</wired-checkbox>
 
           <label for="size">Character Size:</label>
           <wired-slider
@@ -209,7 +208,7 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
             @change="${(e) => this._updateSetting('faceitem', parseInt(e.detail.value))}"
           ></wired-slider>
 
-          <label for="hair">Hair Style:</label>
+          <label for="hair">Hair Style (must have hair checked):</label>
           <wired-slider
             id="hair"
             value="${this.characterSettings.hair}"
@@ -244,10 +243,7 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
             max="9"
             @change="${(e) => this._updateSetting('skin', parseInt(e.detail.value))}"
           ></wired-slider>
-
           
-        
-
           <label for="hatColor">Hat Color:</label>
           <wired-slider
             id="hatColor"
