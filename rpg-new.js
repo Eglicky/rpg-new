@@ -148,6 +148,7 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
           <div class="seed-display">Seed: ${this.characterSettings.seed}</div>
           <div class="character-name">${this.characterSettings.name}</div>
           <rpg-character
+            literalseed
             base="${this.characterSettings.base}"
             face="${this.characterSettings.face}"
             faceitem="${this.characterSettings.faceitem}"
@@ -332,7 +333,7 @@ export class RpgNew extends DDDSuper(I18NMixin(LitElement)) {
     this.characterSettings.seed = params.get("seed");
     this._applySeedToSettings(); // Apply the seed to settings
   }
-  
+  console.log("Seed on page load:", this.characterSettings.seed);
   this.requestUpdate();
 }
 }
